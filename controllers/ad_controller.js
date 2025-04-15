@@ -1,58 +1,5 @@
 const Ad = require("../models/ad_image_model");
 const Campaign = require("../models/campaign_model");
-const axios = require("axios");
-
-const platformWeights = {
-  Facebook: 1.2,
-  Instagram: 1.1,
-  Google: 1.3,
-  Twitter: 1.0,
-};
-
-const seasonalMultiplier = 1.2; // Example static value, can be dynamic
-
-const getPrice = async (req, res) => {
-  //budgetmethod
-  try {
-    const { totalBudget, campaignId } = req.body;
-
-    if (!totalBudget) {
-      return res.status(400).json({ error: "Total budget is required" });
-    }
-    if (!campaignId) {
-      return res.status(400).json({ error: "Campaign ID is required" });
-    }
-
-    const adsData = await Ad.find({ campaignId });
-
-    if (!adsData.length) {
-      return res.status(404).json({ error: "No ad data found" });
-    }
-
-    const adsWithScores = adsData.map((ad) => {
-      const adScore =
-        ad.ctr * 2 + 1 / ad.cpa + 1 / ad.cpc + ad.conversion_rate * 2;
-      const platformWeight = platformWeights[ad.platform] || 1;
-      const adjustedScore = adScore * platformWeight * seasonalMultiplier;
-      return { ...ad._doc, adScore, adjustedScore };
-    });
-
-    const totalScore = adsWithScores.reduce(
-      (sum, ad) => sum + ad.adjustedScore,
-      0
-    );
-    const allocatedBudgets = adsWithScores.map((ad) => ({
-      industry: ad.industry,
-      platform: ad.platform,
-      allocatedBudget: (ad.adjustedScore / totalScore) * totalBudget,
-    }));
-
-    res.status(200).json(allocatedBudgets);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal server error" });
-  }
-};
 
 const add = async (req, res) => {
   try {
@@ -196,7 +143,6 @@ const getAdsfromCampaign = async (req, res) => {
 };
 
 module.exports = {
-  getPrice,
   add,
   getAdsfromCampaign,
   postCampaign,
