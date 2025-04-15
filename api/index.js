@@ -31,6 +31,7 @@ app.use(
 console.log("Its working");
 //ROUTES
 // /predict is the prediction router
+app.use("/budget", predictionRouter); // Use the prediction route for /predict
 app.use("/ads", adRouter);
 app.use("/auth", authRouter);
 app.use("/predict", predictionRouter);
