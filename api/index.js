@@ -24,7 +24,7 @@ app.use(express.json({ limit: "50mb" }));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(
   cors({
-    origin: "http://localhost:4200",
+    origin: `${process.env.FRONTEND_URL}`, // Replace with your frontend URL
     credentials: true, // Allow sending cookies (if needed)
   })
 );

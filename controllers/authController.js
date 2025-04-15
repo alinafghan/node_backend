@@ -55,7 +55,7 @@ const login = async (req, res, next) => {
 
 const APP_ID = "541525585715121";
 const APP_SECRET = "35f28757da55d50d9de2a04e059e1d75";
-const REDIRECT_URI = "http://localhost:3000/auth/facebook/callback";
+const REDIRECT_URI = `${process.env.BACKEND_URL}/facebook/callback`;
 
 const fblogin = (req, res) => {
   const url = `https://www.facebook.com/v13.0/dialog/oauth?client_id=${APP_ID}&redirect_uri=${REDIRECT_URI}&scope=email`;
@@ -111,13 +111,15 @@ const fbcallback = async (req, res) => {
       expiresIn: "1h",
     });
 
-    res.redirect(`http://localhost:4200/login?token=${token}`);
+    res.redirect(`${process.env.FRONTEND_URL}/login?token=${token}`);
   } catch (error) {
     console.error(
       "Facebook OAuth Error:",
       error.response?.data || error.message
     );
-    res.redirect("http://localhost:4200/login?error=facebook_auth_failed");
+    res.redirect(
+      `${process.env.FRONTEND_URL}/login?error=facebook_auth_failed`
+    );
   }
 };
 
