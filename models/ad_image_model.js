@@ -1,6 +1,9 @@
 const mongoose = require("mongoose");
 
 const adImageSchema = new mongoose.Schema({
+  IDBObjectStore: {
+    type: String,
+  },
   campaignId: {
     type: String,
     required: true,

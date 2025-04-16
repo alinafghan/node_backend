@@ -24,13 +24,13 @@ const addAdImage = async (req, res) => {
       width,
       height,
       imageUrl: `${campaignId}_${Date.now()}`, // You might want to generate a better URL
-      imageData // base64 encoded image data
+      imageData, // base64 encoded image data
     });
 
     const savedAdImage = await newAdImage.save();
 
-    res.status(201).json({ 
-      message: "Ad image added successfully", 
+    res.status(201).json({
+      message: "Ad image added successfully",
       adImage: {
         id: savedAdImage._id,
         campaignId: savedAdImage.campaignId,
@@ -38,8 +38,8 @@ const addAdImage = async (req, res) => {
         width: savedAdImage.width,
         height: savedAdImage.height,
         imageUrl: savedAdImage.imageUrl,
-        createdAt: savedAdImage.createdAt
-      } 
+        createdAt: savedAdImage.createdAt,
+      },
     });
   } catch (error) {
     console.error(error);
@@ -53,7 +53,9 @@ const generateAdImage = async (req, res) => {
     const { campaignId, prompt, width, height } = req.body;
 
     if (!campaignId || !prompt) {
-      return res.status(400).json({ error: "Campaign ID and prompt are required" });
+      return res
+        .status(400)
+        .json({ error: "Campaign ID and prompt are required" });
     }
 
     // Check if campaign exists
@@ -68,10 +70,10 @@ const generateAdImage = async (req, res) => {
       width: width || 576,
       height: height || 1024,
       randomize_seed: true,
-      num_inference_steps: 4
+      num_inference_steps: 4,
     });
 
-    if (!response.data || !response.data['Generated Image']) {
+    if (!response.data || !response.data["Generated Image"]) {
       return res.status(500).json({ error: "Failed to generate image" });
     }
 
@@ -82,13 +84,13 @@ const generateAdImage = async (req, res) => {
       width: width || 576,
       height: height || 1024,
       imageUrl: `${campaignId}_${Date.now()}`,
-      imageData: response.data['Generated Image'] // base64 encoded image
+      imageData: response.data["Generated Image"], // base64 encoded image
     });
 
     const savedAdImage = await newAdImage.save();
 
-    res.status(201).json({ 
-      message: "Ad image generated and added successfully", 
+    res.status(201).json({
+      message: "Ad image generated and added successfully",
       adImage: {
         id: savedAdImage._id,
         campaignId: savedAdImage.campaignId,
@@ -97,8 +99,8 @@ const generateAdImage = async (req, res) => {
         height: savedAdImage.height,
         imageUrl: savedAdImage.imageUrl,
         createdAt: savedAdImage.createdAt,
-        imageData: savedAdImage.imageData
-      } 
+        imageData: savedAdImage.imageData,
+      },
     });
   } catch (error) {
     console.error(error);
@@ -118,18 +120,20 @@ const getAdImagesForCampaign = async (req, res) => {
     const adImages = await AdImage.find({ campaignId });
 
     if (!adImages.length) {
-      return res.status(404).json({ error: "No ad images found for this campaign" });
+      return res
+        .status(404)
+        .json({ error: "No ad images found for this campaign" });
     }
 
     // Format the response to exclude sensitive or large data if needed
-    const formattedAdImages = adImages.map(img => ({
+    const formattedAdImages = adImages.map((img) => ({
       id: img._id,
       campaignId: img.campaignId,
       prompt: img.prompt,
       width: img.width,
       height: img.height,
       imageUrl: img.imageUrl,
-      createdAt: img.createdAt
+      createdAt: img.createdAt,
     }));
 
     res.status(200).json(formattedAdImages);
@@ -162,7 +166,7 @@ const getAdImageById = async (req, res) => {
       height: adImage.height,
       imageUrl: adImage.imageUrl,
       imageData: adImage.imageData, // Include image data in response
-      createdAt: adImage.createdAt
+      createdAt: adImage.createdAt,
     });
   } catch (error) {
     console.error(error);
@@ -192,10 +196,39 @@ const deleteAdImage = async (req, res) => {
   }
 };
 
+const updateAdWithCaption = async (req, res) => {
+  try {
+    const { id, caption } = req.body;
+
+    if (!id || !caption) {
+      return res.status(400).json({ error: "Ad ID and caption are required." });
+    }
+
+    const updatedAd = await AdImage.findByIdAndUpdate(
+      id,
+      { caption },
+      { new: true }
+    );
+
+    if (!updatedAd) {
+      return res.status(404).json({ error: "Ad not found." });
+    }
+
+    res.status(200).json({
+      message: "Caption updated successfully.",
+      updatedAd,
+    });
+  } catch (error) {
+    console.error("Error updating caption:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
 module.exports = {
   addAdImage,
   generateAdImage,
+  updateAdWithCaption,
   getAdImagesForCampaign,
   getAdImageById,
-  deleteAdImage
+  deleteAdImage,
 };

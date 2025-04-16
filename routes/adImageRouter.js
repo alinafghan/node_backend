@@ -4,7 +4,8 @@ const {
   generateAdImage,
   getAdImagesForCampaign,
   getAdImageById,
-  deleteAdImage
+  deleteAdImage,
+  updateAdWithCaption,
 } = require("../controllers/ad_image_controller");
 
 const router = express.Router();
@@ -23,5 +24,7 @@ router.get("/:imageId", getAdImageById);
 
 // Delete an ad image
 router.delete("/:imageId", deleteAdImage);
+
+router.put("/update_caption", updateAdWithCaption);
 
 module.exports = router;
