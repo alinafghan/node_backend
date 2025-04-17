@@ -55,7 +55,7 @@ const login = async (req, res, next) => {
 
 const APP_ID = "541525585715121";
 const APP_SECRET = "35f28757da55d50d9de2a04e059e1d75";
-const REDIRECT_URI = `${process.env.BACKEND_URL}/facebook/callback`;
+const REDIRECT_URI = `${process.env.BACKEND_URL}/auth/facebook/callback`;
 
 const fblogin = (req, res) => {
   const url = `https://www.facebook.com/v13.0/dialog/oauth?client_id=${APP_ID}&redirect_uri=${REDIRECT_URI}&scope=email`;
