@@ -5,15 +5,19 @@ const {
   postCampaign,
   getAllCampaigns,
   getCampaign,
-} = require("../controllers/ad_controller");
+} = require("../controllers/campaign_controller");
+const { authenticate } = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
 router.get("/getCampaign/:campaignId", getCampaign);
 
 router.post("/add", add);
+
 router.post("/getAdsfromCampaign", getAdsfromCampaign);
-router.get("/getAllCampaigns", getAllCampaigns);
-router.post("/postCampaign", postCampaign);
+
+router.get("/getAllCampaigns", authenticate, getAllCampaigns);
+
+router.post("/postCampaign", authenticate, postCampaign);
 
 module.exports = router;

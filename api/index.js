@@ -8,7 +8,7 @@ const connectDB = require("../config/db.config");
 const userRouter = require("../routes/UserRouter");
 const trendsRoutes = require("../routes/TrendsModelRoute");
 const authRouter = require("../routes/authRouter");
-const adRouter = require("../routes/adsRouter");
+const campaignRouter = require("../routes/campaignRouter");
 const adImageRouter = require("../routes/adImageRouter"); // Add the new ad image router
 const budgetRouter = require("../routes/budgetRouter");
 
@@ -32,7 +32,7 @@ console.log("Its working");
 //ROUTES
 // /predict is the prediction router
 app.use("/budget", budgetRouter); // Use the prediction route for /predict
-app.use("/ads", adRouter);
+app.use("/ads", campaignRouter);
 app.use("/auth", authRouter);
 app.use("/user", userRouter);
 // app.use("/predict", predictionRouter);
