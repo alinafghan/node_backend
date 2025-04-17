@@ -118,7 +118,7 @@ const getAllCampaigns = async (req, res) => {
   try {
     const businessId = req.user.id; // adjust this if the user object structure is different
 
-    const campaigns = await Campaign.find({ business_id: businessId });
+    const campaigns = await Campaign.find({ businessId: businessId });
 
     if (campaigns.length === 0) {
       return res.status(400).json({ error: "No campaigns found" });
