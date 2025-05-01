@@ -6,6 +6,7 @@ const {
   getAdImageById,
   deleteAdImage,
   updateAdWithCaption,
+  addConversions,
 } = require("../controllers/ad_image_controller");
 
 const router = express.Router();
@@ -27,4 +28,5 @@ router.delete("/:imageId", deleteAdImage);
 
 router.put("/update_caption", updateAdWithCaption);
 
+router.put("/add_conversions", addConversions);
 module.exports = router;

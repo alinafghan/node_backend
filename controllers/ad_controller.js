@@ -49,9 +49,14 @@ const add = async (req, res) => {
 
 const postCampaign = async (req, res) => {
   try {
-    const { campaignId, campaignName, industry, platform, duration } = req.body;
-
-    const business_id = req.user.id; // adjust this if the user object structure is different
+    const {
+      campaignId,
+      campaignName,
+      industry,
+      platform,
+      duration,
+      businessId,
+    } = req.body;
 
     if (!campaignId || !businessId) {
       return res
@@ -65,7 +70,7 @@ const postCampaign = async (req, res) => {
       industry,
       platform,
       duration,
-      business_id,
+      businessId,
     });
 
     const campaign = await newCampaign.save();
@@ -100,34 +105,17 @@ const getCampaign = async (req, res) => {
   }
 };
 
-// const getAllCampaigns = async (req, res) => {
-//   try {
-//     const campaigns = await Campaign.find({});
-
-//     if (campaigns.length === 0) {
-//       res.status(400).json({ error: "No campaigns found" });
-//     }
-//     res.status(200).json(campaigns);
-//   } catch (e) {
-//     console.error(e);
-//     res.status(500).json({ error: "internal server error" });
-//   }
-// };
-
 const getAllCampaigns = async (req, res) => {
   try {
-    const businessId = req.user.id; // adjust this if the user object structure is different
-
-    const campaigns = await Campaign.find({ businessId: businessId });
+    const campaigns = await Campaign.find({});
 
     if (campaigns.length === 0) {
-      return res.status(400).json({ error: "No campaigns found" });
+      res.status(400).json({ error: "No campaigns found" });
     }
-
     res.status(200).json(campaigns);
   } catch (e) {
     console.error(e);
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ error: "internal server error" });
   }
 };
 

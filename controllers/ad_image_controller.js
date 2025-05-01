@@ -5,7 +5,10 @@ const axios = require("axios");
 // Add a new ad image to a campaign
 const addAdImage = async (req, res) => {
   try {
-    const { campaignId, prompt, width, height, imageData } = req.body;
+    const { campaignId, prompt, width, height, imageData, conversions } =
+      req.body;
+
+    // print("Received request to add ad image:", req.body);
 
     if (!campaignId || !prompt || !width || !height || !imageData) {
       return res.status(400).json({ error: "All fields are required" });
@@ -23,6 +26,7 @@ const addAdImage = async (req, res) => {
       prompt,
       width,
       height,
+      conversions: conversions || [],
       imageUrl: `${campaignId}_${Date.now()}`, // You might want to generate a better URL
       imageData, // base64 encoded image data
     });
@@ -33,6 +37,7 @@ const addAdImage = async (req, res) => {
       message: "Ad image added successfully",
       adImage: {
         id: savedAdImage._id,
+        conversions: savedAdImage.conversions,
         campaignId: savedAdImage.campaignId,
         prompt: savedAdImage.prompt,
         width: savedAdImage.width,
@@ -81,6 +86,7 @@ const generateAdImage = async (req, res) => {
     const newAdImage = new AdImage({
       campaignId,
       prompt,
+      conversions: 0,
       width: width || 576,
       height: height || 1024,
       imageUrl: `${campaignId}_${Date.now()}`,
@@ -100,6 +106,7 @@ const generateAdImage = async (req, res) => {
         imageUrl: savedAdImage.imageUrl,
         createdAt: savedAdImage.createdAt,
         imageData: savedAdImage.imageData,
+        conversions,
       },
     });
   } catch (error) {
@@ -134,6 +141,8 @@ const getAdImagesForCampaign = async (req, res) => {
       height: img.height,
       imageUrl: img.imageUrl,
       createdAt: img.createdAt,
+      conversions: img.conversions ?? 0,
+      // Exclude imageData for performance reasons, if necessary
     }));
 
     res.status(200).json(formattedAdImages);
@@ -167,6 +176,7 @@ const getAdImageById = async (req, res) => {
       imageUrl: adImage.imageUrl,
       imageData: adImage.imageData, // Include image data in response
       createdAt: adImage.createdAt,
+      conversions: adImage.conversions ?? 0,
     });
   } catch (error) {
     console.error(error);
@@ -224,10 +234,41 @@ const updateAdWithCaption = async (req, res) => {
   }
 };
 
+const addConversions = async (req, res) => {
+  try {
+    const { adId, conversions } = req.body;
+
+    if (!adId || !Array.isArray(conversions)) {
+      return res
+        .status(400)
+        .json({ error: "Ad ID and conversions are required." });
+    }
+
+    const updatedAd = await AdImage.findByIdAndUpdate(
+      adId,
+      { $push: { conversions: { $each: conversions } } },
+      { new: true }
+    );
+
+    if (!updatedAd) {
+      return res.status(404).json({ error: "Ad not found." });
+    }
+
+    res.status(200).json({
+      message: "Conversions added successfully.",
+      updatedAd,
+    });
+  } catch (error) {
+    console.error("Error adding conversions:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
 module.exports = {
+  addConversions,
+  updateAdWithCaption,
   addAdImage,
   generateAdImage,
-  updateAdWithCaption,
   getAdImagesForCampaign,
   getAdImageById,
   deleteAdImage,

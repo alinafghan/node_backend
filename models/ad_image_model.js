@@ -1,9 +1,6 @@
 const mongoose = require("mongoose");
 
 const adImageSchema = new mongoose.Schema({
-  IDBObjectStore: {
-    type: String,
-  },
   campaignId: {
     type: String,
     required: true,
@@ -30,6 +27,16 @@ const adImageSchema = new mongoose.Schema({
   // If you're storing base64 image data directly
   imageData: {
     type: String,
+  },
+  impressions: {
+    type: Number,
+  },
+  clicks: {
+    type: Number,
+  },
+  conversions: {
+    type: [Number], // e.g. [5, 10, 3] = 3 weeks of conversions
+    default: [],
   },
   createdAt: {
     type: Date,

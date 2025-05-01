@@ -3,21 +3,46 @@ const axios = require("axios");
 const User = require("../models/user_model");
 const FB_user = require("../models/facebook_user_model");
 
-// Register a new user
+// Register a new user with additional business details
 const register = async (req, res, next) => {
-  const { username, id, email, password } = req.body;
+  return res.status(200).json({ message: "Jugaar" });
+
+  const { username, id, email, password, firstName, businessName, businessType, businessLogo } = req.body;
+  console.log(req.body)
 
   try {
-    const user = new User({ username, id, email, password });
-
-    const oldUser = await User.findOne({ username });
-
-    if (oldUser) {
-      return res
-        .status(404)
-        .json({ message: "This username already exists, please try another." });
+    // Check if the required fields are provided
+    if (!username || !email || !password || !firstName || !businessName || !businessType || businessLogo) {
+      return res.status(400).json({ message: "All fields are required" });
     }
 
+    // Check if the user already exists by username or email
+    const existingUser = await User.findOne({ $or: [{ username }, { email }] });
+    if (existingUser) {
+      return res.status(404).json({ message: "This username or email already exists, please try another." });
+    }
+
+    // Decode the base64 image
+    //const businessLogoBuffer = Buffer.from(businessLogo.split(',')[1], 'base64'); // Remove data URL prefix and decode
+
+    // Optionally, save the logo to a file or cloud storage, here we're saving it locally
+    //const logoPath = `uploads/${Date.now()}_business_logo.png`;
+    //fs.writeFileSync(logoPath, businessLogoBuffer);
+
+
+    // Create a new user
+    const user = new User({
+      username,
+      id,
+      email,
+      password,
+      firstName,
+      businessName,
+      businessType,
+      businessLogo,
+    });
+
+    // Save the user to the database
     await user.save();
     res.json({ message: "Registration successful" });
   } catch (error) {
@@ -53,15 +78,17 @@ const login = async (req, res, next) => {
   }
 };
 
+// Facebook login
 const APP_ID = "541525585715121";
 const APP_SECRET = "35f28757da55d50d9de2a04e059e1d75";
-const REDIRECT_URI = `${process.env.BACKEND_URL}/auth/facebook/callback`;
+const REDIRECT_URI = "http://localhost:3000/auth/facebook/callback";
 
 const fblogin = (req, res) => {
   const url = `https://www.facebook.com/v13.0/dialog/oauth?client_id=${APP_ID}&redirect_uri=${REDIRECT_URI}&scope=email`;
   return res.redirect(url);
 };
 
+// Facebook callback function
 const fbcallback = async (req, res) => {
   if (!req.query.code) {
     return res.status(400).json({ message: "Authorization code not provided" });
@@ -111,16 +138,11 @@ const fbcallback = async (req, res) => {
       expiresIn: "1h",
     });
 
-    res.redirect(`${process.env.FRONTEND_URL}/login?token=${token}`);
+    res.redirect(`http://localhost:4200/login?token=${token}`);
   } catch (error) {
-    console.error(
-      "Facebook OAuth Error:",
-      error.response?.data || error.message
-    );
-    res.redirect(
-      `${process.env.FRONTEND_URL}/login?error=facebook_auth_failed`
-    );
+    console.error("Facebook OAuth Error:", error.response?.data || error.message);
+    res.redirect("http://localhost:4200/login?error=facebook_auth_failed");
   }
 };
 
-module.exports = { register, login, fblogin, fbcallback };
+module.exports = {register, login, fblogin, fbcallback };

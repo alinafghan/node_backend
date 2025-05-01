@@ -6,7 +6,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  id: { type: String, required: true },
+  id: { 
+    type: String, 
+    required: true 
+  },
   email: {
     type: String,
     required: true,
@@ -19,6 +22,22 @@ const userSchema = new mongoose.Schema({
     type: String,
     enum: ["user", "admin"],
     default: "user",
+  },
+  firstName: {
+    type: String,
+    required: true, // First name of the user
+  },
+  businessName: {
+    type: String,
+    required: true, // Business name
+  },
+  businessType: {
+    type: String,
+    required: true, // Type of business (Retail, Consulting, etc.)
+  },
+  businessLogo: {
+    type: String, // URL to the uploaded business logo
+    required: true, 
   },
   createdAt: {
     type: Date,

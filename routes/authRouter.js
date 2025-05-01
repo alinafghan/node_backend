@@ -1,6 +1,7 @@
+// routes/auth.routes.js
 const express = require("express");
 const {
-  register,
+  register,  // We will update this function in the controller
   login,
   fblogin,
   fbcallback,
@@ -8,7 +9,7 @@ const {
 
 const router = express.Router();
 
-router.post("/register", register);
+router.post("/register", register);  // Handling the register (signup) request
 router.post("/login", login);
 router.get("/fblogin", fblogin);
 router.get("/facebook/callback", fbcallback);
